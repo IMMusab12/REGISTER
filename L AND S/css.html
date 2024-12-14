@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Css Quiz</title>
+    <link rel="stylesheetct" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+PT+Guides&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, red, black);
+            background-size: 200% 200%;
+            animation: gradientAnimation 5s infinite alternate;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .quiz-container {
+            background: red;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .quiz-container:hover {
+            transform: scale(1.05);
+        }
+
+        .quiz-container h1 {
+            margin-bottom: 20px;
+        }
+
+        .question {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin: 10px 0;
+        }
+
+        .options button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: black;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .options button:hover {
+            background-color: #333;
+            transform: scale(1.1);
+        }
+
+        .timer {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+     <div class="quiz-container">
+        <h1>Css Quiz</h1>
+        <div class="timer" id="timer">Time Left: 20s</div>
+        <div id="quiz">
+            <div class="question" id="question">Question will go here</div>
+            <ul class="options" id="options">
+                <!-- Options will be inserted here dynamically -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+    { question: "Which CSS property controls the text size?", options: ["font-weight", "font-size", "text-size", "text-style"], answer: "font-size" },
+    { question: "How do you make a list of items horizontal using CSS?", options: ["list-style-type: none;", "display: inline;", "list-type: horizontal;", "display: block;"], answer: "display: inline;" },
+    { question: "Which property is used to change the background color of an element in CSS?", options: ["color", "background-color", "bgcolor", "back-color"], answer: "background-color" },
+    { question: "What does the `z-index` property in CSS do?", options: ["Specifies the stack order of elements", "Controls the background of an element", "Controls the alignment of text", "Sets the opacity of an element"], answer: "Specifies the stack order of elements" },
+    { question: "How do you center an element horizontally using CSS?", options: ["margin: auto;", "text-align: center;", "align: center;", "display: center;"], answer: "margin: auto;" },
+    { question: "Which CSS property is used to set the space between elements?", options: ["spacing", "padding", "margin", "border"], answer: "margin" },
+    { question: "Which of the following is used to make an element’s text bold in CSS?", options: ["font-weight: bold;", "text-bold: true;", "font-size: bold;", "text-decoration: bold;"], answer: "font-weight: bold;" },
+    { question: "Which CSS property is used to change the text color of an element?", options: ["color", "text-color", "font-color", "background-color"], answer: "color" },
+    { question: "What does the `border-radius` property in CSS do?", options: ["Creates a shadow effect on the border", "Rounds the corners of an element", "Sets the width of the border", "Changes the border style"], answer: "Rounds the corners of an element" },
+    { question: "How can you add a comment in a CSS file?", options: ["// This is a comment", "/* This is a comment */", "<!-- This is a comment -->", "# This is a comment"], answer: "/* This is a comment */" }
+];
+
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 20;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const timerEl = document.getElementById("timer");
+
+        function loadQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionEl.textContent = currentQuestion.question;
+            optionsEl.innerHTML = "";
+
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option);
+                optionsEl.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedOption) {
+            const currentQuestion = quizData[currentQuestionIndex];
+
+            if (selectedOption === currentQuestion.answer) {
+                score++;
+            }
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timerEl.textContent = `Time Left: ${timeLeft}s`;
+
+            if (timeLeft <= 0) {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            clearInterval(timerInterval);
+            Swal.fire({
+                title: 'Quiz Completed!',
+                text: `Your score is ${score} out of ${quizData.length}`,
+                icon: 'success',
+                confirmButtonText: 'Try Again',
+            }).then(() => {
+                currentQuestionIndex = 0;
+                score = 0;
+                timeLeft = 60;
+                loadQuestion();
+                timerInterval = setInterval(updateTimer, 1000);
+            });
+        }
+
+        let timerInterval = setInterval(updateTimer, 1000);
+        loadQuestion();
+    </script>
+    <script src="s.js"></script>
+</body>
+</html>
